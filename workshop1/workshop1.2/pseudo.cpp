@@ -21,12 +21,55 @@ void initArrow(sf::ConvexShape &arrow)
     arrow.setOutlineThickness(3);
 };
 
-void getNewPosition(const sf::Vector2f &mousePosition, Arrow &arrow){
+void initConst()
+{
+    const float pointerSpeed = 30;
+}
+
+const sf::Vector2f getNewPosition(const sf::Vector2f &mousePosition, Arrow &arrow)
+{
     //get new position of arrow
+    const sf::Vector2f delta = mousePosition - arrow.getPosition();
+    return  delta;
 };
 
-void getNewRotation(const sf::Vector2f &mousePosition, Arrow &arrow){
+float getNewRotation(const sf::Vector2f &deltaPosition)
+{
     //get new rotation of arrow in 0..360 degrees range
+    float angle = atan2(delta.y, delta.x);
+    if (angle < 0)
+    {
+        angle = angle + 2 * M_PI;
+    }
+    return toDegrees(angle);
+}
+
+void setNewRotation(float &mouseRotation, Arrow &arrow)
+    const float pointerRotation = pointer.getRotation();
+    const float maxRotation = pointerSpeed * dt;
+    float nextRotation = std::min(std::abs(mouseRotation - maxRotation), maxRotation);
+    if (mouseRotation < pointerRotation)
+    {
+        if ((mouseRotation + 180) < pointerRotation)
+        {
+            arrow.setRotation(pointerRotation + nextRotation);
+        }
+        else
+        {
+            arrow.setRotation(pointerRotation - nextRotation);
+        }
+    }
+    else
+    {
+        if ((mouseRotation - 180) > pointerRotation)
+        {
+            arrow.setRotation(pointerRotation - nextRotation);
+        }
+        else
+        {
+            arrow.setRotation(pointerRotation + nextRotation);
+        }
+    }
 };
 
 void pollEvents(sf::RenderWindow &window)
@@ -47,9 +90,10 @@ void pollEvents(sf::RenderWindow &window)
 
 void update(const sf::Vector2f &mousePosition, Arrow &arrow)
 {
-    getNewPosition(mousePosition, arrow);
-    getNewRotation(mousePosition, arrow);
+    const sf::Vector2f deltaPosition = getNewPosition(mousePosition, arrow);
+    float mouseRotation = getNewRotation(deltaPosition);
     //change arrows position and rotation
+    setNewRotation(mouseRotation, arrow);
 }
 
 void redrawFrame(sf::RenderWindow &window, sf::ConvexShape &arrow)
@@ -75,6 +119,7 @@ int main()
     sf::Vector2f mousePosition;
 
     initArrow(arrow);
+    initConst();
     while (window.isOpen())
     {
         pollEvents(window);
