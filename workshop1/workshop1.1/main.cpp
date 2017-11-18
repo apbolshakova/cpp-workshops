@@ -41,7 +41,6 @@ void redrawFrame(sf::RenderWindow &window, sf::ConvexShape &arrow)
 {
     window.clear(sf::Color::White);
     window.draw(arrow);
-    window.draw(arrow);
     window.display();
 }
 

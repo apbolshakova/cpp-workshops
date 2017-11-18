@@ -60,7 +60,7 @@ float toDegrees(float radians)
 float getNewRotation(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, const float &deltaTime, const sf::Vector2f &motionVector)
 {
     //TODO complete that function
-    float angle = atan2(motionVector.y, motionVector.x);
+    /*float angle = atan2(motionVector.y, motionVector.x);
     if (angle < 0)
     {
         angle = angle + 2 * M_PI;
@@ -89,7 +89,7 @@ float getNewRotation(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, 
         {
             return (pointerRotation + nextRotation);
         }
-    }
+    }*/
     return 0;
 };
 

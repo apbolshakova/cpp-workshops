@@ -21,8 +21,7 @@ void initArrow(sf::ConvexShape &arrow)
     arrow.setOutlineThickness(3);
 };
 
-void getNewPosition(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, float &deltaTime)
-{
+void getOffset(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, float &deltaTime){
     //get new position of arrow
 };
 
@@ -49,10 +48,10 @@ void pollEvents(sf::RenderWindow &window)
 
 void update(const sf::Vector2f &mousePosition, Arrow &arrow)
 {
-    const sf::Vector2f deltaPosition = getNewPosition(mousePosition, arrow);
-    float mouseRotation = getNewRotation(deltaPosition);
-    //change arrows position and rotation
-    setNewRotation(mouseRotation, arrow);
+    const float deltaTime = clock.restart().asSeconds();
+    const sf::Vector2f arrowPosition = arrow.getPosition();
+    const sf::Vector2f motionVector = mousePosition - arrowPosition;
+    //change arrows position and rotation with getOffset() and getNewRotation()
 }
 
 void redrawFrame(sf::RenderWindow &window, sf::ConvexShape &arrow)
