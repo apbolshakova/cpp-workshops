@@ -24,7 +24,7 @@ void initArrow(sf::ConvexShape &arrow)
     arrow.setOutlineThickness(3);
 };
 
-sf::Vector2f getNewPosition(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, const float &deltaTime, const sf::Vector2f &motionVector)
+sf::Vector2f getOffset(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, const float &deltaTime, const sf::Vector2f &motionVector)
 {
     const float speed = 20;
     const float motion = fabs(hypot(motionVector.x, motionVector.y));
@@ -47,10 +47,20 @@ sf::Vector2f getNewPosition(const sf::Vector2f &mousePosition, sf::ConvexShape &
     }
 };
 
+float toDegrees(float radians)
+{
+    float result = double(radians) * 180.0 / M_PI;
+    if (result < 0)
+    {
+        result = 360 + result;
+    }
+    return result;
+}
+
 float getNewRotation(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, const float &deltaTime, const sf::Vector2f &motionVector)
 {
     //TODO complete that function
-    /*float angle = atan2(motionVector.y, motionVector.x);
+    float angle = atan2(motionVector.y, motionVector.x);
     if (angle < 0)
     {
         angle = angle + 2 * M_PI;
@@ -79,7 +89,7 @@ float getNewRotation(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, 
         {
             return (pointerRotation + nextRotation);
         }
-    }*/
+    }
     return 0;
 };
 
@@ -110,8 +120,9 @@ void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition)
 void update(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, sf::Clock &clock)
 {
     const float deltaTime = clock.restart().asSeconds();
-    const sf::Vector2f motionVector = mousePosition - arrow.getPosition();
-    arrow.setPosition(arrow.getPosition() + getNewPosition(mousePosition, arrow, deltaTime, motionVector));
+    const sf::Vector2f arrowPosition = arrow.getPosition();
+    const sf::Vector2f motionVector = mousePosition - arrowPosition;
+    arrow.move(getOffset(mousePosition, arrow, deltaTime, motionVector));
     arrow.setRotation(getNewRotation(mousePosition, arrow, deltaTime, motionVector));
 }
 
