@@ -24,15 +24,15 @@ void initArrow(sf::ConvexShape &arrow)
     arrow.setOutlineThickness(3);
 };
 
-sf::Vector2f getOffset(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, const float &deltaTime, const sf::Vector2f &motionVector)
+sf::Vector2f getOffset(const float &deltaTime, const sf::Vector2f &motionVector)
 {
     const float speed = 20;
-    const float motion = fabs(hypot(motionVector.x, motionVector.y));
+    const float motion = hypot(motionVector.x, motionVector.y);
     if (motion > 0)
     {
         const sf::Vector2f direction = {motionVector.x / motion, motionVector.y / motion};
         const sf::Vector2f offsetPerFrame = direction * speed * deltaTime;
-        if (motion < fabs(hypot(offsetPerFrame.x, offsetPerFrame.y)))
+        if (motion < hypot(offsetPerFrame.x, offsetPerFrame.y))
         {
             return motionVector;
         }
@@ -122,7 +122,7 @@ void update(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, sf::Clock
     const float deltaTime = clock.restart().asSeconds();
     const sf::Vector2f arrowPosition = arrow.getPosition();
     const sf::Vector2f motionVector = mousePosition - arrowPosition;
-    arrow.move(getOffset(mousePosition, arrow, deltaTime, motionVector));
+    arrow.move(getOffset(deltaTime, motionVector));
     arrow.setRotation(getNewRotation(mousePosition, arrow, deltaTime, motionVector));
 }
 
