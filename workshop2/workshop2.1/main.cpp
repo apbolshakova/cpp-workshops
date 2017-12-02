@@ -4,18 +4,27 @@
 
 struct Ball
 {
-    sf::CircleShape circleShape[30];
+    sf::CircleShape circleShape(30);
     sf::Vector2f speed;
-    sf::Color color;
 }
 
-main()
+void
+initBallsArray(Ball &balls)
+{
+    balls.circleShape.setPosition({random(0, 800), random(0, 600)}); //height and width window
+    balls.circleShape.setFillColor(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+    balls.speed = {40.f, 25.f};
+}
+
+int main()
 {
     const int WINDOW_WIDTH = 800;
     const int WINDOW_HEIGHT = 600;
+    const int BALL_SIZE = 30;
 
-    Ball balls[] = {
-        {, {50.f, 15.f}, sf::Color::Red}};
+    //Ball balls[];
+    Ball balls;
+    initBallsArray(balls);
 
     sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Moving Balls");
     sf::Clock clock;
