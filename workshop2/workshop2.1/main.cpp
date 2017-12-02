@@ -34,7 +34,7 @@ main()
         }
 
         const float deltaTime = clock.restart().asSeconds();
-        for (Ball ball : balls)
+        for (Ball &ball : balls)
         {
             int ballSize = ball.circleShape.getRadius();
             sf::Vector2f position = ball.circleShape.getPosition();
@@ -62,7 +62,7 @@ main()
         }
 
         window.clear();
-        for (Ball ball : balls)
+        for (Ball &ball : balls)
         {
             window.draw(ball.circleShape);
         }
