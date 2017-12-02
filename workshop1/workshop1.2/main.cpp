@@ -60,14 +60,17 @@ float toDegrees(float radians)
 float getNewRotation(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, const float &deltaTime, const sf::Vector2f &motionVector)
 {
     //TODO complete that function
-    /*float angle = atan2(motionVector.y, motionVector.x);
+    float angle = atan2(motionVector.y, motionVector.x);
     if (angle < 0)
     {
         angle = angle + 2 * M_PI;
     }
-    float mouseRotation = toDegrees(angle);
+
+    const float pointerSpeed = 60;
+    const float mouseRotation = toDegrees(angle);
+    const float maxRotation = pointerSpeed * deltaTime;
     const float pointerRotation = arrow.getRotation();
-    float nextRotation = std::min(std::abs(mouseRotation - offsetPerFrame), offsetPerFrame);
+    float nextRotation = std::min(std::abs(mouseRotation - maxRotation), maxRotation);
     if (mouseRotation < pointerRotation)
     {
         if ((mouseRotation + 180) < pointerRotation)
@@ -89,7 +92,7 @@ float getNewRotation(const sf::Vector2f &mousePosition, sf::ConvexShape &arrow, 
         {
             return (pointerRotation + nextRotation);
         }
-    }*/
+    }
     return 0;
 };
 
