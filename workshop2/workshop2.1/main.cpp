@@ -2,18 +2,24 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 
-struct ball
+struct Ball
 {
     sf::CircleShape circleShape;
     sf::Vector2f speed;
+    sf::Color color;
 }
 
-int
+void FillTheArray()
+{
+
+}
+
 main()
 {
     const int WINDOW_WIDTH = 800;
     const int WINDOW_HEIGHT = 600;
     sf::Vector2f speed = {50.f, 15.f};
+    Ball balls[NUMBER]
 
     sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Moving Balls");
     sf::Clock clock;
