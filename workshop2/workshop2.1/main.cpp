@@ -4,26 +4,18 @@
 
 struct Ball
 {
-    sf::CircleShape circleShape;
+    sf::CircleShape circleShape[30];
     sf::Vector2f speed;
     sf::Color color;
-}
-
-void FillTheArray()
-{
-
 }
 
 main()
 {
     const int WINDOW_WIDTH = 800;
     const int WINDOW_HEIGHT = 600;
-<<<<<<< HEAD
-    sf::Vector2f speed = {50.f, 15.f};
-    Ball balls[NUMBER]
-=======
-    const int BALL_SIZE = 30;
->>>>>>> 5765fe5f95e213bfe607ede1ad76c573fd7c4c2d
+
+    Ball balls[] = {
+        {, {50.f, 15.f}, sf::Color::Red}};
 
     sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Moving Balls");
     sf::Clock clock;
@@ -40,10 +32,10 @@ main()
         }
 
         const float deltaTime = clock.restart().asSeconds();
-        for (ball ball : balls)
+        for (Ball ball : balls)
         {
             sf::Vector2f position = ball.circleShape.getPosition();
-            position += ball.speed * dt;
+            position += ball.speed * deltaTime;
 
             if ((position.x + 2 * BALL_SIZE >= WINDOW_WIDTH) && (ball.speed.x > 0))
             {
@@ -62,13 +54,14 @@ main()
                 ball.speed.y = -ball.speed.y;
             }
 
+            ball.circleShape.setFillColor(ball.color);
             ball.circleShape.setPosition(position);
         }
 
         window.clear();
-        for (ball ball : balls)
+        for (Ball ball : balls)
         {
-            window.draw(shape);
+            window.draw(ball.circleShape);
         }
         window.display();
     }
