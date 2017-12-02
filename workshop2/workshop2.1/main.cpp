@@ -13,11 +13,10 @@ main()
 {
     const int WINDOW_WIDTH = 800;
     const int WINDOW_HEIGHT = 600;
-    sf::Vector2f speed = {50.f, 15.f};
+    const int BALL_SIZE = 30;
 
     sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Moving Balls");
     sf::Clock clock;
-    sf::CircleShape shape(BALL_SIZE);
 
     while (window.isOpen())
     {
@@ -31,31 +30,36 @@ main()
         }
 
         const float deltaTime = clock.restart().asSeconds();
+        for (ball ball : balls)
+        {
+            sf::Vector2f position = ball.circleShape.getPosition();
+            position += ball.speed * dt;
 
-        sf::Vector2f position = shape.getPosition();
-        position += speed * dt;
+            if ((position.x + 2 * BALL_SIZE >= WINDOW_WIDTH) && (ball.speed.x > 0))
+            {
+                ball.speed.x = -ball.speed.x;
+            }
+            if ((position.x < 0) && (ball.speed.x < 0))
+            {
+                ball.speed.x = -ball.speed.x;
+            }
+            if ((position.y + 2 * BALL_SIZE >= WINDOW_HEIGHT) && (ball.speed.y > 0))
+            {
+                ball.speed.y = -ball.speed.y;
+            }
+            if ((position.y < 0) && (ball.speed.y < 0))
+            {
+                ball.speed.y = -ball.speed.y;
+            }
 
-        if ((position.x + 2 * BALL_SIZE >= WINDOW_WIDTH) && (speed.x > 0))
-        {
-            speed.x = -speed.x;
+            ball.circleShape.setPosition(position);
         }
-        if ((position.x < 0) && (speed.x < 0))
-        {
-            speed.x = -speed.x;
-        }
-        if ((position.y + 2 * BALL_SIZE >= WINDOW_HEIGHT) && (speed.y > 0))
-        {
-            speed.y = -speed.y;
-        }
-        if ((position.y < 0) && (speed.y < 0))
-        {
-            speed.y = -speed.y;
-        }
-
-        shape.setPosition(position);
 
         window.clear();
-        window.draw(shape);
+        for (ball ball : balls)
+        {
+            window.draw(shape);
+        }
         window.display();
     }
 }
