@@ -2,12 +2,18 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
+#include <cmath>
+
+constexpr int WINDOW_WIDTH = 800;
+constexpr int WINDOW_HEIGHT = 600;
+constexpr int BALL_SIZE = 80;
 
 struct Ball
 {
     sf::CircleShape circleShape;
     sf::Vector2f speed;
     sf::Color color;
+    sf::Vector2f initPosition;
 };
 
 void initBallsArray(Ball *balls, size_t size)
@@ -15,66 +21,105 @@ void initBallsArray(Ball *balls, size_t size)
     for (size_t i = 0; i < size; i++)
     {
         balls[i].circleShape.setFillColor(balls[i].color);
-        balls[i].circleShape.setPosition({400, 400});
+        balls[i].circleShape.setPosition(balls[i].initPosition);
     }
+}
+
+void pollEvents(sf::RenderWindow &window)
+{
+    sf::Event event;
+    while (window.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+        {
+            window.close();
+        }
+    }
+}
+
+void handleCollisionWithWindow(Ball *balls, size_t &ballIndex, sf::Vector2f &position)
+{
+    if ((position.x + 2 * BALL_SIZE >= WINDOW_WIDTH) && (balls[ballIndex].speed.x > 0))
+    {
+        balls[ballIndex].speed.x = -balls[ballIndex].speed.x;
+    }
+    if ((position.x < 0) && (balls[ballIndex].speed.x < 0))
+    {
+        balls[ballIndex].speed.x = -balls[ballIndex].speed.x;
+    }
+    if ((position.y + 2 * BALL_SIZE >= WINDOW_HEIGHT) && (balls[ballIndex].speed.y > 0))
+    {
+        balls[ballIndex].speed.y = -balls[ballIndex].speed.y;
+    }
+    if ((position.y < 0) && (balls[ballIndex].speed.y < 0))
+    {
+        balls[ballIndex].speed.y = -balls[ballIndex].speed.y;
+    }
+}
+
+float dot(const sf::Vector2f &v1, const sf::Vector2f &v2)
+{
+    return (v1.x * v2.x) + (v1.y * v2.y);
+}
+
+void handleCollisionWithBalls(Ball *balls, const size_t &ballsArraySize, size_t &ballIndex, sf::Vector2f &position)
+{
+    for (size_t nextBallIndex = ballIndex + 1; nextBallIndex < ballsArraySize; ++nextBallIndex)
+    {
+        const sf::Vector2f speedDifference = balls[ballIndex].speed - balls[nextBallIndex].speed;
+
+        const sf::Vector2f distance = position - balls[nextBallIndex].circleShape.getPosition();
+        float distanceModule = hypot(distance.x, distance.y);
+
+        if (distanceModule < (BALL_SIZE * 2))
+        {
+            balls[ballIndex].speed = balls[ballIndex].speed - (dot(distance, speedDifference) * distance) / (distanceModule * distanceModule);
+            balls[nextBallIndex].speed = balls[nextBallIndex].speed - (dot(-distance, -speedDifference) * -distance) / (distanceModule * distanceModule);
+        }
+    }
+}
+
+void update(sf::Clock &clock, Ball *balls, const size_t &ballsArraySize)
+{
+    const float deltaTime = clock.restart().asSeconds();
+    for (size_t ballIndex = 0; ballIndex < ballsArraySize; ++ballIndex)
+    {
+        sf::Vector2f position = balls[ballIndex].circleShape.getPosition();
+
+        handleCollisionWithWindow(balls, ballIndex, position);
+        handleCollisionWithBalls(balls, ballsArraySize, ballIndex, position);
+
+        position += balls[ballIndex].speed * deltaTime;
+        balls[ballIndex].circleShape.setPosition(position);
+    }
+}
+
+void redrawFrame(sf::RenderWindow &window, Ball *balls, size_t size)
+{
+    window.clear();
+    for (size_t i = 0; i < size; i++)
+    {
+        window.draw(balls[i].circleShape);
+    }
+    window.display();
 }
 
 int main()
 {
-    const int WINDOW_WIDTH = 800;
-    const int WINDOW_HEIGHT = 600;
-    const int BALL_SIZE = 30;
-
     Ball balls[] = {
-        {sf::CircleShape(30), {50.f, 15.f}, sf::Color::Red},
-        {sf::CircleShape(50), {40.f, 30.f}, sf::Color::Blue}};
-    initBallsArray(balls, std::size(balls));
+        {sf::CircleShape(BALL_SIZE), {200.f, 150.f}, sf::Color::Red, {200.f, 200.f}},
+        {sf::CircleShape(BALL_SIZE), {-500.f, 30.f}, sf::Color::Blue, {400.f, 400.f}}};
+
+    const size_t ballsArraySize = std::size(balls);
+    initBallsArray(balls, ballsArraySize);
 
     sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Moving Balls");
     sf::Clock clock;
 
     while (window.isOpen())
     {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-        }
-
-        const float deltaTime = clock.restart().asSeconds();
-        for (Ball &ball : balls)
-        {
-            int ballSize = ball.circleShape.getRadius();
-            sf::Vector2f position = ball.circleShape.getPosition();
-            position += ball.speed * deltaTime;
-
-            if ((position.x + 2 * ballSize >= WINDOW_WIDTH) && (ball.speed.x > 0))
-            {
-                ball.speed.x = -ball.speed.x;
-            }
-            if ((position.x < 0) && (ball.speed.x < 0))
-            {
-                ball.speed.x = -ball.speed.x;
-            }
-            if ((position.y + 2 * ballSize >= WINDOW_HEIGHT) && (ball.speed.y > 0))
-            {
-                ball.speed.y = -ball.speed.y;
-            }
-            if ((position.y < 0) && (ball.speed.y < 0))
-            {
-                ball.speed.y = -ball.speed.y;
-            }
-            ball.circleShape.setPosition(position);
-        }
-
-        window.clear();
-        for (Ball &ball : balls)
-        {
-            window.draw(ball.circleShape);
-        }
-        window.display();
+        pollEvents(window);
+        update(clock, balls, ballsArraySize);
+        redrawFrame(window, balls, ballsArraySize);
     }
 }
