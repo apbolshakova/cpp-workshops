@@ -3,6 +3,9 @@
 #include <SFML/Window.hpp>
 #include <iostream>
 #include <cmath>
+#include <ctime>
+#include <cassert>
+#include <random>
 
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
@@ -14,6 +17,11 @@ struct Ball
     sf::Vector2f speed;
     sf::Color color;
     sf::Vector2f initPosition;
+};
+
+struct PRNG
+{
+    std::mt19937 engine;
 };
 
 void initBallsArray(Ball *balls, size_t size)
@@ -104,11 +112,49 @@ void redrawFrame(sf::RenderWindow &window, Ball *balls, size_t size)
     window.display();
 }
 
+void initGenerator(PRNG &generator)
+{
+    const unsigned seed = unsigned(std::time(nullptr));
+    generator.engine.seed(seed);
+}
+
+unsigned random(PRNG &generator, unsigned minValue, unsigned maxValue)
+{
+    assert(minValue < maxValue);
+    std::uniform_int_distribution<unsigned> distribution(minValue, maxValue);
+    return distribution(generator.engine);
+}
+
+sf::Color mixColor(sf::Color color1, sf::Color color2)
+{
+    sf::Color color;
+    color.r = (color1.r + color2.r) / 2;
+    color.g = (color1.g + color2.g) / 2;
+    color.b = (color1.b + color2.b) / 2;
+    color.a = (color1.a + color2.a) / 2;
+    return color;
+}
+
 int main()
 {
+    sf::Color colors[] = {
+        {sf::Color(0, 51, 204, 255)},
+        {sf::Color(0, 204, 153, 255)},
+        {sf::Color(51, 51, 153, 255)},
+        {sf::Color(51, 102, 255, 255)},
+        {sf::Color(51, 255, 153, 255)},
+        {sf::Color(102, 51, 153, 255)},
+        {sf::Color(153, 0, 153, 255)},
+        {sf::Color(204, 153, 255, 255)},
+        {sf::Color(204, 255, 255, 255)},
+        {sf::Color(204, 204, 255, 255)}};
+
+    PRNG generator;
+    initGenerator(generator);
+
     Ball balls[] = {
-        {sf::CircleShape(BALL_SIZE), {200.f, 150.f}, sf::Color::Red, {200.f, 200.f}},
-        {sf::CircleShape(BALL_SIZE), {-500.f, 30.f}, sf::Color::Blue, {400.f, 400.f}}};
+        {sf::CircleShape(BALL_SIZE), {200.f, 150.f}, mixColor(colors[random(generator, 0, std::size(colors))], colors[random(generator, 0, std::size(colors))]), {200.f, 200.f}},
+        {sf::CircleShape(BALL_SIZE), {-500.f, 30.f}, mixColor(colors[random(generator, 0, std::size(colors))], colors[random(generator, 0, std::size(colors))]), {400.f, 400.f}}};
 
     const size_t ballsArraySize = std::size(balls);
     initBallsArray(balls, ballsArraySize);
